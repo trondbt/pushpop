@@ -2,11 +2,16 @@ $(function() {
     var App = {
         init: function() {
             this.$displayDiv = $("#showResults");
+            this.$komponent  = $("input[name='komponent']");
+            this.$q          = $("input[name='q']");
+
             App.attachFormHandler();
             App.attachPopstateHandler();
 
             if (App.getUrlParameter("komponent") && App.getUrlParameter("q")) {
                 var urlData = App.compileUrlData();
+                this.$q.val(urlData.q).focus();
+
                 App.doSomething(urlData);
                 App.pushState(urlData);
             }
@@ -45,10 +50,10 @@ $(function() {
             });
         },
 
-        compileFormData: function(data) {
+        compileFormData: function(form) {
             return {
-                komponent: $(data).find("input[name='komponent']").val(),
-                q: $(data).find("input[name='q']").val()
+                komponent: $(form).find("input[name='komponent']").val(),
+                q: $(form).find("input[name='q']").val()
             }
         },
 
