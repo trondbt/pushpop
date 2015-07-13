@@ -2,23 +2,23 @@ $(function() {
     var App = {
         init: function() {
             this.$displayDiv = $("#showResults");
+            this.$form       = $("#sok");
             this.$komponent  = $("input[name='komponent']");
             this.$q          = $("input[name='q']");
 
             App.attachFormHandler();
             App.attachPopstateHandler();
 
-            if (App.getUrlParameter("komponent") && App.getUrlParameter("q")) {
-                var urlData = App.compileUrlData();
-                this.$q.val(urlData.q).focus();
+            if (App.checkUrl()) {
+                this.$komponent.val(App.getUrlParameter("komponent"));
+                this.$q.val(App.getUrlParameter("q")).focus();
 
-                App.doSomething(urlData);
-                App.pushState(urlData);
+                this.$form.submit();
             }
         },
 
         attachFormHandler: function() {
-            $("#sok").on("submit", function(e) {
+            this.$form.on("submit", function(e) {
                 e.preventDefault();
                 var formData = App.compileFormData(this);
                 App.doSomething(formData);
@@ -57,11 +57,8 @@ $(function() {
             }
         },
 
-        compileUrlData: function() {
-            return {
-                komponent: App.getUrlParameter("komponent"),
-                q: App.getUrlParameter("q")
-            }
+        checkUrl: function() {
+            return App.getUrlParameter("komponent") && App.getUrlParameter("q");
         },
 
         getUrlParameter: function(sParam) {
