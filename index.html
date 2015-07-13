@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jsTest</title>
+    <style>
+    body {
+        padding: 20px 50px;
+    }
+
+    input[type="text"] {
+        width: 150px;
+        padding: 5px;
+        padding-right: 50px;
+        font-size: 15px;
+    }
+
+    .goButton {
+        margin-left: -45px;
+    }
+
+    .hide {
+        display: none;
+    }
+    </style>
+</head>
+<body>
+<h1>Hei</h1>
+
+<form id="sok">
+    <input type="hidden" name="komponent" value="SALGSMELDING">
+    <input type="text" name="q" placeholder="Søk her">
+    <button class="goButton">GO</button>
+</form>
+
+<div id="showResults" class="hide">
+
+</div>
+
+<script src="./lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(function() {
+        var App = {
+            init: function() {
+                this.$displayDiv = $("#showResults");
+                App.attachFormHandler();
+                App.attachPopstateHandler();
+
+                if (App.getUrlParameter("komponent") && App.getUrlParameter("q")) {
+                    var urlData = App.compileUrlData();
+                    App.doSomething(urlData);
+                    App.pushState(urlData);
+                }
+            },
+
+            attachFormHandler: function() {
+                $("#sok").on("submit", function(e) {
+                    e.preventDefault();
+                    var formData = App.compileFormData(this);
+                    App.doSomething(formData);
+                    App.pushState(formData);
+                });
+            },
+
+            doSomething: function(formData) {
+                this.$displayDiv
+                    .html("komponent: " + formData.komponent + "<br>q: " + formData.q)
+                    .show();
+            },
+
+            pushState: function(formData) {
+                var url = "?komponent=" + formData.komponent + "&q=" + formData.q;
+
+                history.pushState(
+                    formData,
+                    "Hendelseslogg",
+                    url
+                );
+            },
+
+            attachPopstateHandler: function() {
+                $(window).on("popstate", function(e) {
+                    if (e.originalEvent.state) {
+                        App.doSomething(e.originalEvent.state);
+                    }
+                });
+            },
+
+            compileFormData: function(data) {
+                return {
+                    komponent: $(data).find("input[name='komponent']").val(),
+                    q: $(data).find("input[name='q']").val()
+                }
+            },
+
+            compileUrlData: function() {
+                return {
+                    komponent: App.getUrlParameter("komponent"),
+                    q: App.getUrlParameter("q")
+                }
+            },
+
+            getUrlParameter: function(sParam) {
+                var sPageURL = window.location.search.substring(1);
+                var sURLVariables = sPageURL.split('&');
+                for (var i = 0; i < sURLVariables.length; i++) {
+                    var sParameterName = sURLVariables[i].split('=');
+                    if (sParameterName[0] == sParam) {
+                        return sParameterName[1];
+                    }
+                }
+            }
+        }
+
+        App.init();
+    });
+</script>
+</body>
+</html>
